@@ -10,6 +10,9 @@ from constants import *
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 
 class NodeWorker(Thread):
+    """
+    Worker thread class invoked by the chord node
+    """
     def __init__(self,
         relations,
         data,
@@ -76,6 +79,9 @@ class NodeWorker(Thread):
             self.relations.pred = node
 
     def run(self):
+        """
+        All messages go through the run method where each command is checked
+        """
         self.logger.info("Starting worker node ")
         data = self.connection.recv(2048)
         if not data:

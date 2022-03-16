@@ -10,6 +10,9 @@ import logging
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 
 class PeriodicWorker(Thread):
+    """
+    Worker thread responsible for running the stabilization algorith periodically
+    """
 
     def __init__(self,relations,onStop,updateRelations,updateSuccessorList,successorList):
         Thread.__init__(self)
@@ -36,18 +39,11 @@ class PeriodicWorker(Thread):
                 continue
             msg={"type":"dummy"}
             ClientSocket.send(str.encode(json.dumps(msg)))     
-
             ClientSocket.close()
-
             return succ
-
         return self.relations.own
 
 
-
-
-
-    
     def stabalize(self):   
         newSucc = self.findFirstAvailableSuccessor()
 

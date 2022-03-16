@@ -4,6 +4,9 @@ import json
 from NeighbourNode import NeighbourNode
 
 class NodeState:
+    """
+    This class represents the collection of relationships each chord node has
+    """
 
     def __init__(self,own=None,succ=None,pred=None):
         self.own = own

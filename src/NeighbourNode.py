@@ -2,6 +2,9 @@ import socket
 import json
 
 class NeighbourNode:
+    """
+    This class is a representation for a relationship node connected to a chord node
+    """
     def __init__(self,host=None,port=None,id=None):
         self.host = host
         self.port = port
@@ -49,7 +52,6 @@ class NeighbourNode:
         })))    
         
     def store(self,key,value):
-        print("Store called")
         ClientSocket = socket.socket()
         try:
             ClientSocket.connect((self.host, int(self.port)))
@@ -72,7 +74,6 @@ class NeighbourNode:
     def getSuccessorList(self):
         
         ClientSocket = socket.socket()
-        print('Waiting for connection')
         try:
             print('WHOST/PORT',self.host, int(self.port))
             ClientSocket.connect((self.host, int(self.port)))
@@ -100,9 +101,7 @@ class NeighbourNode:
     
     def getAllDataForNode(self,key):    
         ClientSocket = socket.socket()
-        print('Waiting for connection')
         try:
-            print('WHOST/PORT',self.host, int(self.port))
             ClientSocket.connect((self.host, int(self.port)))
         except socket.error as e:
             print(str(e))
@@ -126,12 +125,7 @@ class NeighbourNode:
 
 
     def deserialize(self,doc):
-        # print("OBJCT22",type(doc))
-
         obj = json.loads(doc)
-
-        # print("OBJCT",type(obj))
-
         self.host = obj.get("host")
         self.port = obj.get("port")
         self.id = obj.get("id")
@@ -140,7 +134,6 @@ class NeighbourNode:
         ClientSocket = socket.socket()
         print('Waiting for connection')
         try:
-            print('WHOST/PORT',self.host, int(self.port))
             ClientSocket.connect((self.host, int(self.port)))
         except socket.error as e:
             print(str(e))
@@ -165,7 +158,6 @@ class NeighbourNode:
         ClientSocket = socket.socket()
         print('Waiting for connection')
         try:
-            print('WHOST/PORT',self.host, int(self.port))
             ClientSocket.connect((self.host, int(self.port)))
         except socket.error as e:
             print(str(e))
@@ -187,9 +179,7 @@ class NeighbourNode:
 
     def find(self,msg):
         ClientSocket = socket.socket()
-        print('Waiting for connection')
         try:
-            print('HOST/PORT',self.host, int(self.port))
             ClientSocket.connect((self.host, int(self.port)))
         except socket.error as e:
             print(str(e))
@@ -200,10 +190,4 @@ class NeighbourNode:
         # msg = {"type":"find","payload":"23425"}
         ClientSocket.send(str.encode(json.dumps(msg)))
         Response = ClientSocket.recv(1024)
-
-        
-        print(eval(Response.decode('utf-8')))
-        print(type(Response.decode('utf-8')))
-        print("initiate client conneciton")    
-
         return Response.decode('utf-8')    

@@ -8,6 +8,9 @@ DEFAULT_HOST="127.0.0.1"
 DEFAULT_PORT=65000
 
 class RootNote:
+    """
+    The root node where a reference for each node in the ring is kept
+    """
 
     sdht_nodes = []
 

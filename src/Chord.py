@@ -22,7 +22,10 @@ ownKey=int(hashlib.sha256(str(host+":"+str(port)).encode()).hexdigest(),16) % CH
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 
 class Chord:
-    
+    """
+    Main object associated with a node in the DHT
+
+    """    
     def __init__(self,
         host,
         port,
@@ -80,6 +83,11 @@ class Chord:
 
 
     def initiateJoin(self):
+        """
+        Start the chord node by doing the following
+            - Connect to root node and get an entry point for the chord ring
+            - If there is no nodes in the ring , initiate as the starting node
+        """
         self.logger.info("Requesting to join ring ")
         rootClientSocket = socket.socket()
         try:
@@ -113,8 +121,8 @@ class Chord:
 
                 rootClientSocket.close()
                 self.startListningtoPort()
-                    # call confirm
             else:
+                #Join the ring by calling the chord node with join message
                 self.logger.info("Calling entry node..")
                 joinHost = res.get("host")
                 joinPort = res.get("port")
@@ -125,16 +133,20 @@ class Chord:
                 except socket.error as e:
                     print(str(e))
 
+                #Chord ring node returns the hash key for node and the successor node
                 msg = {"type":"join","hashKey":self.id}
+
                 ClientSocket.send(str.encode(json.dumps(msg)))
                 Response = ClientSocket.recv(1024)
 
                 if Response is not None:
                     self.logger.info("Successor node recieved : %s",Response.decode('utf-8'))
+                    # set own successor node
                     succ = NeighbourNode()
                     succ.deserialize(Response)
                     self.relations.succ = succ
 
+                    # Ask for relevent key value pairs from successor node
                     data = succ.getAllDataForNode(key=self.relations.own.id)
                     self.logger.info("Transferred data from successor node : %s",data)
                     for item in data:
@@ -142,9 +154,12 @@ class Chord:
                     
                     #set finger table first entry to succ
                     self.fingerTable[1] = succ
+
+                    #Get successor list form the successor node
                     list = succ.getSuccessorList() if succ.id != self.id else []
                     self.updateSuccessorList(list)
 
+                    #Send the confirmation msg to root node so it can add this node as a ring node
                     rootClientSocket.send(str.encode(json.dumps({
                         "type":"joinConfirmation",
                         "host":self.host,
@@ -170,9 +185,16 @@ class Chord:
         self.successorList = successors
 
     def start(self):
+        """
+        Main Entry point for the chord node
+        """
         self.initiateJoin()
 
     def startListningtoPort(self):
+        """
+        This method listens for incoming connections in a continous loop and
+        delegate handling of each message to a new Thread
+        """
         ServerSocket  = socket.socket()
         self.logger.info("Listning to incoming requests...")
         try:
@@ -182,6 +204,7 @@ class Chord:
         self.logger.info("Waiting for a connection")
         ServerSocket.listen(5)
 
+        # Start the stabalization thread in the background
         stabilizer = PeriodicWorker(
             relations=self.relations,
             onStop=self.onStabalizerStop,
@@ -198,9 +221,9 @@ class Chord:
                 self.logger.info("Node Data count: %s",len(self.data))
                 
                 Client,address = ServerSocket.accept()
-
                 self.logger.info("New Connection with : %s",address)
 
+                #initiate a worker thread to handle the request
                 worker = NodeWorker(
                     relations=self.relations,
                     data=self.data,
