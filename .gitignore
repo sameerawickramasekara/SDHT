@@ -7,5 +7,6 @@
 [Ss]cripts
 pyvenv.cfg
 .vscode/
+src/__pycache__/*
 .venv
 pip-selfcheck.json
