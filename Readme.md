@@ -3,6 +3,9 @@
 
 This is an implementation of a distributed hash table using Chord protocol 
 
+![Untitled Diagram drawio (1)](https://user-images.githubusercontent.com/29540334/161046149-239b243e-f12c-4508-b703-9b172daf7b83.png)
+
+
 #### Building Docker containers
 
 Build the RootNode
